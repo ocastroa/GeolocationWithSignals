@@ -10,9 +10,20 @@ import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MarkerOptions;
 
+import com.pubnub.api.PNConfiguration;
+import com.pubnub.api.PubNub;
+import com.pubnub.api.callbacks.SubscribeCallback;
+import com.pubnub.api.models.consumer.PNStatus;
+import com.pubnub.api.models.consumer.pubsub.PNMessageResult;
+import com.pubnub.api.models.consumer.pubsub.PNPresenceEventResult;
+
+import java.util.Arrays;
+
+
 public class MapsActivity extends FragmentActivity implements OnMapReadyCallback {
 
   private GoogleMap mMap;
+  PubNub pubnub;
 
   @Override
   protected void onCreate(Bundle savedInstanceState) {
@@ -22,6 +33,42 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager()
             .findFragmentById(R.id.map);
     mapFragment.getMapAsync(this);
+
+    initPubNub();
+  }
+
+  public void initPubNub(){
+    PNConfiguration pnConfiguration = new PNConfiguration();
+    pnConfiguration.setPublishKey("Your_Pub_Key_Here");
+    pnConfiguration.setSubscribeKey("Your_Sub_Key_Here");
+    pnConfiguration.setSecure(true);
+    pubnub = new PubNub(pnConfiguration);
+
+    // Listen to messages that arrive in the channel
+    pubnub.addListener(new SubscribeCallback() {
+      @Override
+      public void status(PubNub pub, PNStatus status) {
+      }
+
+      @Override
+      public void message(PubNub pub, final PNMessageResult message) {
+      }
+
+      @Override
+      public void presence(PubNub pub, PNPresenceEventResult presence) {
+
+      }
+
+      @Override
+      public void signal(PubNub pubnub, final PNMessageResult signal) {
+
+      }
+    });
+
+    // Subscribe to the global channel
+    pubnub.subscribe()
+          .channels(Arrays.asList("geolocation_channel"))
+          .execute();
   }
 
 
