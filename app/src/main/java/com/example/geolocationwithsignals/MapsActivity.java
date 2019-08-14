@@ -15,19 +15,22 @@ import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.gson.JsonArray;
 import com.pubnub.api.PNConfiguration;
 import com.pubnub.api.PubNub;
+import com.pubnub.api.callbacks.PNCallback;
 import com.pubnub.api.callbacks.SubscribeCallback;
+import com.pubnub.api.models.consumer.PNPublishResult;
 import com.pubnub.api.models.consumer.PNStatus;
 import com.pubnub.api.models.consumer.pubsub.PNMessageResult;
 import com.pubnub.api.models.consumer.pubsub.PNPresenceEventResult;
 
+import java.text.DecimalFormat;
 import java.util.Arrays;
 
 public class MapsActivity extends FragmentActivity implements OnMapReadyCallback {
 
   private GoogleMap mMap;
-  PubNub pubnub;
-  Marker marker;
-  Boolean isMarkerPlaced = false;
+  private PubNub pubnub;
+  private Marker marker;
+  private Boolean isMarkerPlaced = false;
 
   @Override
   protected void onCreate(Bundle savedInstanceState) {
@@ -41,6 +44,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     initPubNub();
   }
 
+  // Initialize PubNub and set up a listener
   public void initPubNub(){
     PNConfiguration pnConfiguration = new PNConfiguration();
     pnConfiguration.setPublishKey("Your_Pub_Key_Here");
@@ -67,6 +71,19 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
       @Override
       public void signal(PubNub pubnub, final PNMessageResult signal) {
+        System.out.println("Message: " + signal.getMessage());
+
+        runOnUiThread(new Runnable() {
+          @Override
+          public void run() {
+            try {
+              JsonArray payload = signal.getMessage().getAsJsonArray();
+              placeMarker(payload);
+            } catch (Exception e) {
+              e.printStackTrace();
+            }
+          }
+        });
 
       }
     });
@@ -81,8 +98,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
   /**
    * Manipulates the map once available.
    * This callback is triggered when the map is ready to be used.
-   * This is where we can add markers or lines, add listeners or move the camera. In this case,
-   * we just add a marker near Sydney, Australia.
+   * This is where we can add markers or lines, add listeners or move the camera.
    * If Google Play services is not installed on the device, the user will be prompted to install
    * it inside the SupportMapFragment. This method will only be triggered once the user has
    * installed Google Play services and returned to the app.
@@ -97,6 +113,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     payload.add(-122.395344);
     placeMarker(payload);
 
+    // Listener for when marker is dragged to another location
     mMap.setOnMarkerDragListener(new GoogleMap.OnMarkerDragListener() {
       @Override
       public void onMarkerDrag(Marker arg0) {
@@ -107,11 +124,25 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
       public void onMarkerDragEnd(Marker arg0) {
         Log.d("Marker", "Finished");
 
-        // Updated payload coordinates
+        // Get coordinate values up to 6 decimal numbers
+        DecimalFormat decimalFormat = new DecimalFormat("0.######");
         JsonArray payload = new JsonArray();
-        payload.add(marker.getPosition().latitude);
-        payload.add(marker.getPosition().longitude);
-        placeMarker(payload);
+        payload.add(decimalFormat.format(marker.getPosition().latitude));
+        payload.add(decimalFormat.format(marker.getPosition().longitude));
+
+        // Message Payload size for Signals is limited to 30 bytes
+        pubnub.signal()
+              .channel("geolocation_channel")
+              .message(payload)
+              .async(new PNCallback<PNPublishResult>() {
+                @Override
+                public void onResponse(PNPublishResult result, PNStatus status) {
+                  // Error
+                  if(status.isError()) {
+                    System.out.println("Error: pub status code: " + status.getStatusCode());
+                  }
+                }
+              });
       }
 
       @Override
@@ -121,23 +152,24 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     });
   }
 
+  // Place marker on the map in the specified location
   public void placeMarker(JsonArray loc){
-    Log.d("Marker", "placeMarker function");
-
+    //LatLng only accepts arguments of type Double
     Double lat = loc.get(0).getAsDouble();
     Double lng = loc.get(1).getAsDouble();
-
     LatLng newLoc = new LatLng(lat,lng);
 
     if(isMarkerPlaced){
+      // Change position of the marker
       marker.setPosition(newLoc);
     }
     else{
+      // Add a marker to the map in the specified location
       marker = mMap.addMarker(new MarkerOptions().position(newLoc).title("Marker").draggable(true));
       isMarkerPlaced = true;
-      System.out.println(marker.getPosition());
     }
 
+    // Move the camera to the location of the marker
     mMap.moveCamera(CameraUpdateFactory.newLatLng(newLoc));
   }
 }
