@@ -2,14 +2,17 @@ package com.example.geolocationwithsignals;
 
 import android.support.v4.app.FragmentActivity;
 import android.os.Bundle;
+import android.util.Log;
 
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 
+import com.google.gson.JsonArray;
 import com.pubnub.api.PNConfiguration;
 import com.pubnub.api.PubNub;
 import com.pubnub.api.callbacks.SubscribeCallback;
@@ -19,11 +22,12 @@ import com.pubnub.api.models.consumer.pubsub.PNPresenceEventResult;
 
 import java.util.Arrays;
 
-
 public class MapsActivity extends FragmentActivity implements OnMapReadyCallback {
 
   private GoogleMap mMap;
   PubNub pubnub;
+  Marker marker;
+  Boolean isMarkerPlaced = false;
 
   @Override
   protected void onCreate(Bundle savedInstanceState) {
@@ -48,10 +52,12 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     pubnub.addListener(new SubscribeCallback() {
       @Override
       public void status(PubNub pub, PNStatus status) {
+
       }
 
       @Override
       public void message(PubNub pub, final PNMessageResult message) {
+
       }
 
       @Override
@@ -85,9 +91,53 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
   public void onMapReady(GoogleMap googleMap) {
     mMap = googleMap;
 
-    // Add a marker in Sydney and move the camera
-    LatLng sydney = new LatLng(-34, 151);
-    mMap.addMarker(new MarkerOptions().position(sydney).title("Marker in Sydney"));
-    mMap.moveCamera(CameraUpdateFactory.newLatLng(sydney));
+    // Init payload coordinates
+    JsonArray payload = new JsonArray();
+    payload.add(37.782486);
+    payload.add(-122.395344);
+    placeMarker(payload);
+
+    mMap.setOnMarkerDragListener(new GoogleMap.OnMarkerDragListener() {
+      @Override
+      public void onMarkerDrag(Marker arg0) {
+        Log.d("Marker", "Dragging");
+      }
+
+      @Override
+      public void onMarkerDragEnd(Marker arg0) {
+        Log.d("Marker", "Finished");
+
+        // Updated payload coordinates
+        JsonArray payload = new JsonArray();
+        payload.add(marker.getPosition().latitude);
+        payload.add(marker.getPosition().longitude);
+        placeMarker(payload);
+      }
+
+      @Override
+      public void onMarkerDragStart(Marker arg0) {
+        Log.d("Marker", "Started");
+      }
+    });
+  }
+
+  public void placeMarker(JsonArray loc){
+    Log.d("Marker", "placeMarker function");
+
+    Double lat = loc.get(0).getAsDouble();
+    Double lng = loc.get(1).getAsDouble();
+
+    LatLng newLoc = new LatLng(lat,lng);
+
+    if(isMarkerPlaced){
+      marker.setPosition(newLoc);
+    }
+    else{
+      marker = mMap.addMarker(new MarkerOptions().position(newLoc).title("Marker").draggable(true));
+      isMarkerPlaced = true;
+      System.out.println(marker.getPosition());
+    }
+
+    mMap.moveCamera(CameraUpdateFactory.newLatLng(newLoc));
   }
 }
