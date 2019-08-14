@@ -162,10 +162,11 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     if(isMarkerPlaced){
       // Change position of the marker
       marker.setPosition(newLoc);
+      marker.setTitle(newLoc.toString());
     }
     else{
       // Add a marker to the map in the specified location
-      marker = mMap.addMarker(new MarkerOptions().position(newLoc).title("Marker").draggable(true));
+      marker = mMap.addMarker(new MarkerOptions().position(newLoc).title(newLoc.toString()).draggable(true));
       isMarkerPlaced = true;
     }
 
