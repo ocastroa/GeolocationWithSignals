@@ -1,6 +1,10 @@
-# GeolocationWithSignals
+# Build a Geolocation App with Android and PubNub Signals
 
-Learn how to build a simple Geolocation app with PubNub Signals! For this app, a marker will initiially be placed in San Francisco. Drag and drop the marker anywhere you please, and the coordinates will be sent to a global channel using Signals. The marker will update for everyone connected to the channel! 
+Learn how to build a simple Geolocation app that sends a stream of GPS coordinates using PubNub Signals! In the app, a marker will initiially be placed in San Francisco. Drag and drop the marker anywhere you please, and the coordinates will be sent to a global channel. The marker will update for everyone connected to the channel! 
+
+<p align="center">
+  <img src="./media/geolocation_app_screenshot.png" alt="Screenshot of client-to-server demo" width="710" height="400" />
+</p>
 
 **Note: This app DOES NOT use your location!**
 
@@ -18,9 +22,9 @@ PubNub Signals is a small message payload, no greater than **30 bytes**, that of
 
  <a href="https://dashboard.pubnub.com/signup?devrel_gh=geolocation-signals-demo">
     <img alt="PubNub Signup" src="https://i.imgur.com/og5DDjf.png" width=260 height=97/>
-  </a>
+</a>
 
-2) Since we are using Google Maps in the app, you need to get a [Google Map API key](https://developers.google.com/maps/documentation/embed/get-api-key). Once you get the key, go to the **debug directory**, under **src**, and add it to the file **google_maps_api.xml**.
+2) Since we are using Google Maps in the app, you need to get a [Google Map API key](https://developers.google.com/maps/documentation/embed/get-api-key). Once you get the key, go to the **debug directory**, under **src**, and add it to the file [google_maps_api.xml](https://github.com/ocastroa/GeolocationWithSignals/blob/master/app/src/debug/res/values/google_maps_api.xml).
 
 3) Clone the repo.
 ```bash
@@ -28,9 +32,9 @@ https://github.com/ocastroa/GeolocationWithSignals
 ```
 4) Open the [MapsActivity.java](https://github.com/ocastroa/GeolocationWithSignals/blob/master/app/src/main/java/com/example/geolocationwithsignals/MapsActivity.java) file in Android Studio and replace 'Your_Pub_Key_Here' and 'Your_Sub_Key_Here' with your Pub/Sub API keys.
 
-5) Run the app on two emulators, drag and drop the marker to anywhere you please, and watch the location change in both emulators! 
+5) Run the app on two emulators, drag and drop the marker anywhere you please, and watch the location change on both emulators! 
 
-## Build Your Own Geolocation App with Android and PubNub Signals
+## Build Your Own Geolocation App
 
 To learn more about this project or if you want to build this project from scratch, check out the tutorial (coming soon).
 
