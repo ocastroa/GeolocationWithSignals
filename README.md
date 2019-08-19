@@ -1,9 +1,9 @@
 # Build a Geolocation App with Android and PubNub Signals
 
-Learn how to build a simple Geolocation app that sends a stream of GPS coordinates using PubNub Signals! In the app, a marker will initiially be placed in San Francisco. Drag and drop the marker anywhere you please, and the coordinates will be sent to a global channel. The marker will update for everyone connected to the channel! 
+Learn how to build a simple Geolocation app that sends a stream of GPS coordinates to other devices using PubNub Signals! In the app, a marker will initiially be placed in San Francisco. Drag and drop the marker anywhere you please, and the coordinates will be sent to a global channel. The marker will update for everyone connected to the channel! 
 
 <p align="center">
-  <img src="./media/geolocation_app_screenshot.png" alt="Screenshot of client-to-server demo" width="710" height="400" />
+  <img src="./media/geolocation_app_screenshot.png" alt="Screenshot of client-to-server demo" width="500" height="440" />
 </p>
 
 **Note: This app DOES NOT use your location!**
