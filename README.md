@@ -32,7 +32,7 @@ https://github.com/ocastroa/GeolocationWithSignals
 ```
 4) Open the [MapsActivity.java](https://github.com/ocastroa/GeolocationWithSignals/blob/master/app/src/main/java/com/example/geolocationwithsignals/MapsActivity.java) file in Android Studio and replace 'Your_Pub_Key_Here' and 'Your_Sub_Key_Here' with your Pub/Sub API keys.
 
-5) Run the app on two emulators, drag and drop the marker anywhere you please, and watch the location change on both emulators! 
+5) Run the app on two emulators, drag and drop the marker anywhere you please, and watch the location change on both emulators! Check out this [demo video](https://youtu.be/x8m7PS2TUZo). 
 
 ## Build Your Own Geolocation App
 
